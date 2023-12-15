@@ -11,21 +11,22 @@ interface Props {
 }
 
 const handleGetCodeValue = async (
+  script: string,
   setLoading: setStateFn<boolean>,
   setData: setStateFn<Value>,
   URL = STATIC_URL
 ) => {
-  const url: string = `${URL}/getScriptsContent/test`
+  // const url: string = `${URL}/getScriptsContent`
+  // const url: string = `${URL}/getScriptsContent/${script}`
+  // http://localhost:8101/dms-app
+  const url = `${STATIC_URL}/getScriptsContent/${script}`
   try {
     setLoading(true)
     const headers = { 'Content-Type': 'application/json' }
     const res = await fetch(url, { method: 'POST', headers })
-    console.log('res', res)
     if (!res.ok) throw new Error()
     const data = await res.json()
-    console.log('data', data)
     const finalData: string = data.content
-    // const finalData: string = JSON.parse(data.content)
     setData(finalData)
   } catch (e) {
     console.error('e', e)
@@ -50,7 +51,7 @@ const CodeEditor: FC<Props> = (props) => {
   console.log('value', value)
   useEffect(() => {
     setLang(LANGS_ARR[0])
-    handleGetCodeValue(setLoading, setValue)
+    handleGetCodeValue('script1', setLoading, setValue)
   }, [])
 
   const handleEditorChange = (value: Value, event: any) => {
@@ -80,7 +81,7 @@ const CodeEditor: FC<Props> = (props) => {
         </Button>
         <Button
           onClick={() => {
-            handleGetCodeValue(setLoading, setValue)
+            handleGetCodeValue('script1', setLoading, setValue)
           }}
           type="primary"
         >
