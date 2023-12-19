@@ -48,7 +48,6 @@ const CodeEditor: FC<Props> = (props) => {
   const [openConfModal, setOpenConfModal] = useState<boolean>(false)
 
   const {} = props
-  console.log('value', value)
   useEffect(() => {
     setLang(LANGS_ARR[0])
     handleGetCodeValue('script1', setLoading, setValue)

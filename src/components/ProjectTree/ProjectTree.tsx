@@ -6,6 +6,7 @@ import ProjectTreeHeader from './ProjectTreeHeader/ProjectTreeHeader'
 import { ProjectContent, setStateFn } from '../../types/general'
 import { STATIC_URL } from '../../Global/Global'
 import ProjectTreeContent from './ProjectTreeContent/ProjectTreeContent'
+import { json } from 'node:stream/consumers'
 
 interface Props {
   projectContent: ProjectContent
@@ -17,31 +18,35 @@ const ProjectTree: FC<Props> = (props) => {
   const [error, setError] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(true)
 
-  const getProjectContent = useCallback(async () => {
-    try {
-      setLoading(true)
-      setError(false)
-      const url = `${STATIC_URL}/get-project-content`
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      if (!res.ok) throw new Error('Failed to fetch project content')
-      const data = await res.json()
-      if (data) {
-        setProjectContent(data)
+  const getProjectContent = useCallback(
+    async (path = '.') => {
+      try {
+        setLoading(true)
+        setError(false)
+        const url = `${STATIC_URL}/get-project-content?path=${path}`
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          // body: JSON.stringify('test'),
+        })
+        if (!res.ok) throw new Error('Failed to fetch project content')
+        const data = await res.json()
+        console.log('data', data)
+        if (data) {
+          setProjectContent(data)
+        }
+      } catch (e) {
+        console.error('e', e)
+        // setError(e)
+        setError(true)
+      } finally {
+        setLoading(false)
       }
-      setProjectContent(data)
-    } catch (e) {
-      console.error('e', e)
-      // setError(e)
-      setError(true)
-    } finally {
-      setLoading(false)
-    }
-  }, [setProjectContent])
+    },
+    [setProjectContent]
+  )
 
   useEffect(() => {
     getProjectContent()
@@ -55,7 +60,7 @@ const ProjectTree: FC<Props> = (props) => {
       ) : (
         <RemainingHeightTemplate>
           <ProjectTreeHeader getProjectContent={getProjectContent} />
-          <ProjectTreeContent projectContent={projectContent} />
+          <ProjectTreeContent projectContent={projectContent} getProjectContent={getProjectContent}/>
         </RemainingHeightTemplate>
       )}
     </Layout.Content>

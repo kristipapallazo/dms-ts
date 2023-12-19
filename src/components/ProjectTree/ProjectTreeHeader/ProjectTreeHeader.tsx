@@ -11,7 +11,7 @@ const ProjectTreeHeader: FC<HeaderProps> = (props) => {
 
   return (
     <AntdHeader>
-      <Button type="primary" onClick={getProjectContent}>
+      <Button type="primary" onClick={() => getProjectContent()}>
         Reload project tree
       </Button>
     </AntdHeader>
