@@ -2,9 +2,6 @@
   height: inherit;
   width: inherit;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap: 10px;
-}
-.app.selectedFile {
   grid-template-columns: 1fr 4fr;
+  column-gap: 10px;
 }

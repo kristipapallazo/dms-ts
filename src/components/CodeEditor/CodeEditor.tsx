@@ -1,29 +1,27 @@
 import React, { FC, useEffect, useState } from 'react'
 import { Editor } from '@monaco-editor/react'
-import classes from './CodeEditor.module.css'
 import { STATIC_URL } from '../../Global/Global'
-import { Value, setStateFn } from '../../types/general'
+import { SetStateFn, TreeNode, Value } from '../../types/general'
 import { Button, Spin } from 'antd'
 import { Theme } from '@monaco-editor/react'
-
-interface Props {
-  // value: string
-}
+import classes from './CodeEditor.module.css'
 
 const handleGetCodeValue = async (
-  script: string,
-  setLoading: setStateFn<boolean>,
-  setData: setStateFn<Value>,
+  selectedFile: TreeNode,
+  setLoading: SetStateFn<boolean>,
+  setData: SetStateFn<Value>,
   URL = STATIC_URL
 ) => {
-  // const url: string = `${URL}/getScriptsContent`
-  // const url: string = `${URL}/getScriptsContent/${script}`
-  // http://localhost:8101/dms-app
-  const url = `${STATIC_URL}/getScriptsContent/${script}`
+  const { name, path } = selectedFile
+  const url = `${STATIC_URL}/get-file-content/${name}`
   try {
     setLoading(true)
     const headers = { 'Content-Type': 'application/json' }
-    const res = await fetch(url, { method: 'POST', headers })
+    const res = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ path }),
+    })
     if (!res.ok) throw new Error()
     const data = await res.json()
     const finalData: string = data.content
@@ -40,21 +38,23 @@ const handleSubmit = async (URL = STATIC_URL) => {
 
 const LANGS_ARR = ['typescript', 'javascript']
 
-const CodeEditor: FC<Props> = (props) => {
+interface CodeEditorProps {
+  selectedFile: TreeNode
+}
+const CodeEditor: FC<CodeEditorProps> = (props) => {
+  const { selectedFile } = props
   const [value, setValue] = useState<Value>(undefined)
   const [loading, setLoading] = useState(true)
   const [lang, setLang] = useState<string>('')
   const [theme, setTheme] = useState<Theme>('vs-dark')
   const [openConfModal, setOpenConfModal] = useState<boolean>(false)
 
-  const {} = props
   useEffect(() => {
     setLang(LANGS_ARR[0])
-    handleGetCodeValue('script1', setLoading, setValue)
-  }, [])
+    handleGetCodeValue(selectedFile, setLoading, setValue)
+  }, [selectedFile])
 
   const handleEditorChange = (value: Value, event: any) => {
-    console.log('value:', value)
     setValue(value)
   }
 
@@ -62,8 +62,8 @@ const CodeEditor: FC<Props> = (props) => {
   return (
     <div className={classes.container}>
       <Editor
-        theme={theme}
         height="90vh"
+        theme={theme}
         language={lang}
         defaultValue={'no value'}
         value={value}
@@ -80,7 +80,7 @@ const CodeEditor: FC<Props> = (props) => {
         </Button>
         <Button
           onClick={() => {
-            handleGetCodeValue('script1', setLoading, setValue)
+            handleGetCodeValue(selectedFile, setLoading, setValue)
           }}
           type="primary"
         >
