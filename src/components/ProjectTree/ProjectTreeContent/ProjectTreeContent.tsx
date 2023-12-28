@@ -29,7 +29,7 @@ const ProjectTreeContent: FC<Props> = (props) => {
       setTimeout(() => {
         fetchProjectContent(path, name, parentIndex, pos)
         resolve()
-      }, 2000)
+      }, 1000)
     })
   return (
     <DirectoryTree
